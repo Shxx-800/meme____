@@ -20,27 +20,56 @@ const TemplatePage = ({ onBackToHome, onTemplateSelect }) => {
 
   const loadTemplates = async () => {
     try {
-      const response = await fetch('/images.json');
-      const imageFiles = await response.json();
+      // First try to load from images.json
+      try {
+        const response = await fetch('/images.json');
+        if (response.ok) {
+          const imageFiles = await response.json();
+          const templateData = imageFiles.map((filename, index) => ({
+            id: index + 1,
+            name: filename.replace(/\.(png|jpe?g|gif|webp)$/i, '').replace(/[-_]/g, ' '),
+            url: `/${filename}`,
+            category: getCategoryFromFilename(filename)
+          }));
+          setTemplates(templateData);
+          setFilteredTemplates(templateData);
+          return;
+        }
+      } catch (jsonError) {
+        console.log('images.json not found, using fallback templates');
+      }
       
-      const templateData = imageFiles.map((filename, index) => ({
-        id: index + 1,
-        name: filename.replace(/\.(png|jpe?g|gif|webp)$/i, '').replace(/[-_]/g, ' '),
-        url: filename.startsWith('http') ? filename : `/${filename}`,
-        category: getCategoryFromFilename(filename)
-      }));
-      
-      setTemplates(templateData);
-      setFilteredTemplates(templateData);
-    } catch (error) {
-      console.error('Error loading templates:', error);
-      // Fallback to default templates if images.json fails
+      // Fallback to working Pexels templates
       const fallbackTemplates = [
-        { id: 1, name: 'Sample Template 1', url: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'General' },
-        { id: 2, name: 'Sample Template 2', url: 'https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'General' }
+        { id: 1, name: 'Drake Pointing', url: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 2, name: 'Success Kid', url: 'https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 3, name: 'Thinking Face', url: 'https://images.pexels.com/photos/3779432/pexels-photo-3779432.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 4, name: 'Surprised Cat', url: 'https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Animals' },
+        { id: 5, name: 'Serious Dog', url: 'https://images.pexels.com/photos/58997/pexels-photo-58997.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Animals' },
+        { id: 6, name: 'Confused Person', url: 'https://images.pexels.com/photos/3771118/pexels-photo-3771118.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 7, name: 'Happy Baby', url: 'https://images.pexels.com/photos/1648375/pexels-photo-1648375.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 8, name: 'Office Worker', url: 'https://images.pexels.com/photos/3182773/pexels-photo-3182773.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 9, name: 'Laughing Person', url: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 10, name: 'Shocked Face', url: 'https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 11, name: 'Thumbs Up', url: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 12, name: 'Facepalm', url: 'https://images.pexels.com/photos/3777931/pexels-photo-3777931.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 13, name: 'Celebration', url: 'https://images.pexels.com/photos/1587927/pexels-photo-1587927.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 14, name: 'Pointing', url: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 15, name: 'Winking', url: 'https://images.pexels.com/photos/1181519/pexels-photo-1181519.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 16, name: 'Cute Puppy', url: 'https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Animals' },
+        { id: 17, name: 'Funny Cat', url: 'https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Animals' },
+        { id: 18, name: 'Business Person', url: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 19, name: 'Excited Person', url: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 20, name: 'Sleepy Cat', url: 'https://images.pexels.com/photos/416160/pexels-photo-416160.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Animals' },
+        { id: 21, name: 'Surprised Person', url: 'https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 22, name: 'Happy Dog', url: 'https://images.pexels.com/photos/1805164/pexels-photo-1805164.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Animals' },
+        { id: 23, name: 'Thinking Person', url: 'https://images.pexels.com/photos/3771069/pexels-photo-3771069.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'People' },
+        { id: 24, name: 'Grumpy Cat', url: 'https://images.pexels.com/photos/617278/pexels-photo-617278.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Animals' }
       ];
       setTemplates(fallbackTemplates);
       setFilteredTemplates(fallbackTemplates);
+    } catch (error) {
+      console.error('Error loading templates:', error);
     } finally {
       setLoading(false);
     }
@@ -181,7 +210,8 @@ const TemplatePage = ({ onBackToHome, onTemplateSelect }) => {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       loading="lazy"
                       onError={(e) => {
-                        e.target.src = 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400';
+                        console.log('Template image failed to load:', e.target.src);
+                        e.target.src = `https://images.pexels.com/photos/${220453 + (template.id || 1)}/pexels-photo-${220453 + (template.id || 1)}.jpeg?auto=compress&cs=tinysrgb&w=400`;
                       }}
                     />
                   </div>

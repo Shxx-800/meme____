@@ -11,21 +11,24 @@ const ImageUpload = ({ onImageSelect, onAIMemeGenerated, onViewMoreTemplates }) 
   useEffect(() => {
     const loadTemplates = async () => {
       try {
-        const response = await fetch("/images.json");
-        if (!response.ok) throw new Error('Failed to load templates');
-        const data = await response.json();
+        // First try to load from images.json
+        try {
+          const response = await fetch("/images.json");
+          if (response.ok) {
+            const data = await response.json();
+            const formattedTemplates = data.map((filename, index) => ({
+              id: index + 1,
+              name: filename.replace(/\.(png|jpe?g|gif|webp)$/i, '').replace(/[-_]/g, ' '),
+              url: `/${filename}`
+            }));
+            setTemplates(formattedTemplates);
+            return;
+          }
+        } catch (jsonError) {
+          console.log('images.json not found, using fallback templates');
+        }
         
-        // Convert to proper format with full URLs
-        const formattedTemplates = data.map((filename, index) => ({
-          id: index + 1,
-          name: filename.replace(/\.(png|jpe?g|gif|webp)$/i, '').replace(/[-_]/g, ' '),
-          url: filename.startsWith('http') ? filename : `/${filename}`
-        }));
-        
-        setTemplates(formattedTemplates);
-      } catch (err) {
-        console.error("Error loading templates:", err);
-        // Fallback templates
+        // Fallback to hardcoded templates with working Pexels URLs
         const fallbackTemplates = [
           { id: 1, name: 'Drake Pointing', url: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400' },
           { id: 2, name: 'Success Kid', url: 'https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg?auto=compress&cs=tinysrgb&w=400' },
@@ -44,6 +47,8 @@ const ImageUpload = ({ onImageSelect, onAIMemeGenerated, onViewMoreTemplates }) 
           { id: 15, name: 'Winking', url: 'https://images.pexels.com/photos/1181519/pexels-photo-1181519.jpeg?auto=compress&cs=tinysrgb&w=400' }
         ];
         setTemplates(fallbackTemplates);
+      } catch (err) {
+        console.error("Error loading templates:", err);
       }
     };
     
@@ -150,8 +155,10 @@ const ImageUpload = ({ onImageSelect, onAIMemeGenerated, onViewMoreTemplates }) 
                   src={template.url || template}
                   alt={template.name || `Template ${index + 1}`}
                   className="w-full h-16 object-cover group-hover:scale-105 transition-transform duration-200"
+                  loading="lazy"
                   onError={(e) => {
-                    e.target.src = 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400';
+                    console.log('Image failed to load:', e.target.src);
+                    e.target.src = `https://images.pexels.com/photos/${220453 + index}/pexels-photo-${220453 + index}.jpeg?auto=compress&cs=tinysrgb&w=400`;
                   }}
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity flex items-center justify-center">
