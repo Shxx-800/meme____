@@ -26,7 +26,7 @@ const TemplatePage = ({ onBackToHome, onTemplateSelect }) => {
       const templateData = imageFiles.map((filename, index) => ({
         id: index + 1,
         name: filename.replace(/\.(png|jpe?g|gif|webp)$/i, '').replace(/[-_]/g, ' '),
-        url: `/${filename}`,
+        url: filename.startsWith('http') ? filename : `/${filename}`,
         category: getCategoryFromFilename(filename)
       }));
       
@@ -34,6 +34,13 @@ const TemplatePage = ({ onBackToHome, onTemplateSelect }) => {
       setFilteredTemplates(templateData);
     } catch (error) {
       console.error('Error loading templates:', error);
+      // Fallback to default templates if images.json fails
+      const fallbackTemplates = [
+        { id: 1, name: 'Sample Template 1', url: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'General' },
+        { id: 2, name: 'Sample Template 2', url: 'https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'General' }
+      ];
+      setTemplates(fallbackTemplates);
+      setFilteredTemplates(fallbackTemplates);
     } finally {
       setLoading(false);
     }
@@ -173,6 +180,9 @@ const TemplatePage = ({ onBackToHome, onTemplateSelect }) => {
                       alt={template.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       loading="lazy"
+                      onError={(e) => {
+                        e.target.src = 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400';
+                      }}
                     />
                   </div>
                   

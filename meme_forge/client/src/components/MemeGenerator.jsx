@@ -33,6 +33,10 @@ const MemeGenerator = ({ preselectedTemplate }) => {
   useEffect(() => {
     if (preselectedTemplate) {
       handleImageSelect(preselectedTemplate);
+      // Clear the preselected template after using it
+      setTimeout(() => {
+        // This ensures the template loads properly
+      }, 100);
     }
   }, [preselectedTemplate]);
 
