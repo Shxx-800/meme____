@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Grid3X3, Sparkles } from 'lucide-react';
 import AIMemeGenerator from './AIMemeGenerator';
 
-const ImageUpload = ({ onImageSelect, onAIMemeGenerated }) => {
+const ImageUpload = ({ onImageSelect, onAIMemeGenerated, onViewMoreTemplates }) => {
   const [activeTab, setActiveTab] = useState('upload');
   const [templates, setTemplates] = useState([]);
   const fileInputRef = useRef(null);
@@ -103,25 +103,36 @@ const ImageUpload = ({ onImageSelect, onAIMemeGenerated }) => {
 
       {/* Templates Tab */}
       {activeTab === 'templates' && (
-        <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-          {templates.map((template, index) => (
-            <button
-              key={index}
-              onClick={() => handleTemplateSelect(template.url)}
-              className="relative group overflow-hidden rounded-md border border-gray-200 hover:border-blue-400 transition-colors"
-            >
-              <img
-                src={template.url}
-                alt={template.name}
-                className="w-full h-16 object-cover group-hover:scale-105 transition-transform duration-200"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity flex items-center justify-center">
-                <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50 px-1.5 py-0.5 rounded">
-                  {template.name}
-                </span>
-              </div>
-            </button>
-          ))}
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+            {templates.slice(0, 15).map((template, index) => (
+              <button
+                key={index}
+                onClick={() => handleTemplateSelect(template.url)}
+                className="relative group overflow-hidden rounded-md border border-gray-200 hover:border-blue-400 transition-colors"
+              >
+                <img
+                  src={template.url}
+                  alt={template.name}
+                  className="w-full h-16 object-cover group-hover:scale-105 transition-transform duration-200"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity flex items-center justify-center">
+                  <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50 px-1.5 py-0.5 rounded">
+                    {template.name}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+          
+          {/* View More Button */}
+          <button
+            onClick={onViewMoreTemplates}
+            className="w-full py-2 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors text-sm font-medium flex items-center justify-center gap-2"
+          >
+            <Grid3X3 className="h-4 w-4" />
+            View More Templates ({Math.max(0, templates.length - 15)}+ more)
+          </button>
         </div>
       )}
 

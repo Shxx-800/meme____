@@ -4,7 +4,7 @@ import ImageUpload from './ImageUpload';
 import TextControls from './TextControls';
 import { drawMemeOnCanvas, drawMemeOnVideo } from '../utils/canvas.js';
 
-const MemeGenerator = () => {
+const MemeGenerator = ({ preselectedTemplate }) => {
   const [selectedImage, setSelectedImage] = useState('');
   const [mediaType, setMediaType] = useState('image'); // 'image', 'video', 'gif'
   const [isPlaying, setIsPlaying] = useState(false);
@@ -28,6 +28,13 @@ const MemeGenerator = () => {
   const previewRef = useRef(null);
   const videoRef = useRef(null);
   const animationFrameRef = useRef(null);
+
+  // Handle preselected template
+  useEffect(() => {
+    if (preselectedTemplate) {
+      handleImageSelect(preselectedTemplate);
+    }
+  }, [preselectedTemplate]);
 
   const handleAIMemeGenerated = (imageUrl, topTextContent, bottomTextContent) => {
     setTopText(prev => ({ ...prev, content: topTextContent }));
@@ -142,6 +149,10 @@ const MemeGenerator = () => {
           <ImageUpload
             onImageSelect={handleImageSelect}
             onAIMemeGenerated={handleAIMemeGenerated}
+            onViewMoreTemplates={() => {
+              // This will be handled by the parent App component
+              window.dispatchEvent(new CustomEvent('viewMoreTemplates'));
+            }}
           />
         </div>
       </div>

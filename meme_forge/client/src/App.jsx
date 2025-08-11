@@ -4,15 +4,38 @@ import { TrendingUp } from 'lucide-react';
 import MemeGenerator from './components/MemeGenerator';
 import Footer from './components/Footer';
 import AboutPage from './pages/AboutPage';
+import TemplatePage from './pages/TemplatePage';
 import logo from './assets/logo.webp';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [selectedTemplate, setSelectedTemplate] = useState('');
+
+  useEffect(() => {
+    const handleViewMoreTemplates = () => {
+      setCurrentPage('templates');
+    };
+
+    window.addEventListener('viewMoreTemplates', handleViewMoreTemplates);
+    return () => window.removeEventListener('viewMoreTemplates', handleViewMoreTemplates);
+  }, []);
+
+  const handleTemplateSelect = (templateUrl) => {
+    setSelectedTemplate(templateUrl);
+    setCurrentPage('home');
+  };
 
   const renderPage = () => {
     switch (currentPage) {
       case 'about':
         return <AboutPage onBackToHome={() => setCurrentPage('home')} />;
+      case 'templates':
+        return (
+          <TemplatePage 
+            onBackToHome={() => setCurrentPage('home')} 
+            onTemplateSelect={handleTemplateSelect}
+          />
+        );
       default:
         return (
           <>
@@ -39,7 +62,7 @@ function App() {
             {/* Main Meme Generator */}
             <main className="pb-8 px-4">
               <div className="container mx-auto bg-white/70 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-200/50">
-                <MemeGenerator layout="horizontal" />
+                <MemeGenerator layout="horizontal" preselectedTemplate={selectedTemplate} />
               </div>
             </main>
           </>
@@ -78,7 +101,7 @@ function App() {
 
               {/* Navigation */}
               <nav className="flex items-center gap-6">
-                {['home', 'about'].map((page) => (
+                {['home', 'templates', 'about'].map((page) => (
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
